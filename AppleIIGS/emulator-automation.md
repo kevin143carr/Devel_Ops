@@ -19,9 +19,9 @@ Use this shape for any emulator:
 Related known-good notes:
 
 - Generic workflow script and project-local environment files:
-  `../devel_ops/appleiigs-workflow-usage.md`
-- ORCA/C build and `iix` test usage: `../devel_ops/iix-orcac-usage.md`
-- GS/OS image import command: `../devel_ops/gsos-image-operations.md`
+  `appleiigs-workflow-usage.md`
+- ORCA/C build and `iix` test usage: `iix-orcac-usage.md`
+- GS/OS image import command: `gsos-image-operations.md`
 
 For the current `HELLO` workflow, the image import command is:
 
@@ -72,7 +72,7 @@ Use the generic workflow script from a project directory that contains a local
 `appleiigs-project.env` file:
 
 ```sh
-../devel_ops/appleiigs-workflow.sh emulator
+/Users/kevincarr/projects/Devel_Ops/AppleIIGS/appleiigs-workflow.sh emulator
 ```
 
 For the current `hello` project, the project-local environment file is

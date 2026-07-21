@@ -6,7 +6,7 @@ alternate tools or metadata experiments.
 
 For repeatable project work, use the generic workflow script plus a
 project-local `appleiigs-project.env` file documented in
-`../devel_ops/appleiigs-workflow-usage.md`.
+`appleiigs-workflow-usage.md`.
 
 ## Known-good: Import a Finder-launchable GS/OS program
 

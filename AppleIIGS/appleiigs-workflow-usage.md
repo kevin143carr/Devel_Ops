@@ -11,10 +11,10 @@ environment file:
 appleiigs-project.env
 ```
 
-Start a new project by copying the example from `devel_ops`:
+Start a new project by copying the example from `Devel_Ops/AppleIIGS`:
 
 ```sh
-cp ../devel_ops/appleiigs-project.env.example ./appleiigs-project.env
+cp /Users/kevincarr/projects/Devel_Ops/AppleIIGS/appleiigs-project.env.example ./appleiigs-project.env
 ```
 
 Then edit the local copy for the project, especially `PROJECT_DIR`, `SOURCE`,
@@ -23,13 +23,13 @@ Then edit the local copy for the project, especially `PROJECT_DIR`, `SOURCE`,
 Run the workflow script from the project directory:
 
 ```sh
-../devel_ops/appleiigs-workflow.sh build
+/Users/kevincarr/projects/Devel_Ops/AppleIIGS/appleiigs-workflow.sh build
 ```
 
 Or pass an explicit environment file:
 
 ```sh
-../devel_ops/appleiigs-workflow.sh --env ./appleiigs-project.env build
+/Users/kevincarr/projects/Devel_Ops/AppleIIGS/appleiigs-workflow.sh --env ./appleiigs-project.env build
 ```
 
 ## Required project environment
@@ -95,9 +95,9 @@ Which run mode do you want?
 Map the answer to exactly one command:
 
 ```text
-1 -> ../devel_ops/appleiigs-workflow.sh run-iix
-2 -> ../devel_ops/appleiigs-workflow.sh run-gsos
-3 -> ../devel_ops/appleiigs-workflow.sh run-both
+1 -> /Users/kevincarr/projects/Devel_Ops/AppleIIGS/appleiigs-workflow.sh run-iix
+2 -> /Users/kevincarr/projects/Devel_Ops/AppleIIGS/appleiigs-workflow.sh run-gsos
+3 -> /Users/kevincarr/projects/Devel_Ops/AppleIIGS/appleiigs-workflow.sh run-both
 ```
 
 Each of these numbered run modes is a complete workflow for the selected

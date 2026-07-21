@@ -5,7 +5,7 @@ Check this before changing compiler commands, output names, or test flow.
 
 For repeatable project work, use the generic workflow script plus a
 project-local `appleiigs-project.env` file documented in
-`../devel_ops/appleiigs-workflow-usage.md`.
+`appleiigs-workflow-usage.md`.
 
 ## Known-good: compile, link, and test `hello.c`
 
@@ -95,4 +95,4 @@ ORCA/iix execution environment. It does not determine the file type to use
 inside a GS/OS hard-drive image.
 
 For the known-good GS/OS/Finder double-click import command, use
-`../devel_ops/gsos-image-operations.md`.
+`gsos-image-operations.md`.
