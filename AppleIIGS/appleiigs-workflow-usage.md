@@ -14,7 +14,7 @@ appleiigs-project.env
 Start a new project by copying the example from `Devel_Ops/AppleIIGS`:
 
 ```sh
-cp /Users/kevincarr/projects/Devel_Ops/AppleIIGS/appleiigs-project.env.example ./appleiigs-project.env
+cp /Users/example/projects/Devel_Ops/AppleIIGS/appleiigs-project.env.example ./appleiigs-project.env
 ```
 
 Then edit the local copy for the project, especially `PROJECT_DIR`, `SOURCE`,
@@ -23,13 +23,13 @@ Then edit the local copy for the project, especially `PROJECT_DIR`, `SOURCE`,
 Run the workflow script from the project directory:
 
 ```sh
-/Users/kevincarr/projects/Devel_Ops/AppleIIGS/appleiigs-workflow.sh build
+/Users/example/projects/Devel_Ops/AppleIIGS/appleiigs-workflow.sh build
 ```
 
 Or pass an explicit environment file:
 
 ```sh
-/Users/kevincarr/projects/Devel_Ops/AppleIIGS/appleiigs-workflow.sh --env ./appleiigs-project.env build
+/Users/example/projects/Devel_Ops/AppleIIGS/appleiigs-workflow.sh --env ./appleiigs-project.env build
 ```
 
 ## Required project environment
@@ -42,21 +42,21 @@ SOURCE="program.c"
 OBJECT="program.obj"
 PROGRAM="program"
 
-IMAGE="$HOME/projects/AppleIIGS/System601HD.hdv"
+IMAGE="/Users/example/projects/AppleIIGS/System601HD.hdv"
 DEST_NAME="PROGRAM"
 FILE_TYPE="S16"
 AUX_TYPE="0"
 
-CLEMENS_APP="/Users/kevincarr/bin/Clemens IIGS.app"
+CLEMENS_APP="/Users/example/Applications/Clemens IIGS.app"
 CLEMENS_NAME="Clemens IIGS"
-CLEMENS_CONFIG="$HOME/Library/Application Support/cinekine/Clemens/config.ini"
+CLEMENS_CONFIG="/Users/example/Library/Application Support/cinekine/Clemens/config.ini"
 RUN_SECONDS="60"
 ```
 
-For the current `hello` project, the environment file is:
+For an example `hello` project, the environment file could be:
 
 ```text
-/Users/kevincarr/projects/AppleIIGS/C/hello/appleiigs-project.env
+/Users/example/projects/AppleIIGS/C/hello/appleiigs-project.env
 ```
 
 ## Stage behavior
@@ -95,9 +95,9 @@ Which run mode do you want?
 Map the answer to exactly one command:
 
 ```text
-1 -> /Users/kevincarr/projects/Devel_Ops/AppleIIGS/appleiigs-workflow.sh run-iix
-2 -> /Users/kevincarr/projects/Devel_Ops/AppleIIGS/appleiigs-workflow.sh run-gsos
-3 -> /Users/kevincarr/projects/Devel_Ops/AppleIIGS/appleiigs-workflow.sh run-both
+1 -> /Users/example/projects/Devel_Ops/AppleIIGS/appleiigs-workflow.sh run-iix
+2 -> /Users/example/projects/Devel_Ops/AppleIIGS/appleiigs-workflow.sh run-gsos
+3 -> /Users/example/projects/Devel_Ops/AppleIIGS/appleiigs-workflow.sh run-both
 ```
 
 Each of these numbered run modes is a complete workflow for the selected

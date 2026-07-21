@@ -16,14 +16,14 @@ image so it can be launched manually from GS/OS/Finder.
 Exact command:
 
 ```sh
-appcom -p "$HOME/projects/AppleIIGS/System601HD.hdv" HELLO S16 0 < ./hello
+appcom -p "/Users/example/projects/AppleIIGS/System601HD.hdv" HELLO S16 0 < ./hello
 ```
 
 Use this when:
 
 - The program has already been built and tested through `iix`.
 - The destination is the real project image:
-  `$HOME/projects/AppleIIGS/System601HD.hdv`.
+  `/Users/example/projects/AppleIIGS/System601HD.hdv`.
 - The desired result is a root-level `HELLO` file that can be double-clicked
   from GS/OS/Finder.
 
@@ -37,7 +37,7 @@ Do not substitute:
 Verification:
 
 ```sh
-appcom -ll "$HOME/projects/AppleIIGS/System601HD.hdv"
+appcom -ll "/Users/example/projects/AppleIIGS/System601HD.hdv"
 ```
 
 The listing must show root-level `HELLO` with type `S16`.

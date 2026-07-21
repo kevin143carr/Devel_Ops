@@ -26,26 +26,26 @@ Related known-good notes:
 For the current `HELLO` workflow, the image import command is:
 
 ```sh
-appcom -p "$HOME/projects/AppleIIGS/System601HD.hdv" HELLO S16 0 < ./hello
+appcom -p "/Users/example/projects/AppleIIGS/System601HD.hdv" HELLO S16 0 < ./hello
 ```
 
 The hard-drive image listing should show root-level `HELLO` with type `S16`.
 
 ## Mac/Clemens implementation
 
-Current locally verified paths and names:
+Example paths and names:
 
 ```sh
-CLEMENS_APP="/Users/kevincarr/bin/Clemens IIGS.app"
+CLEMENS_APP="/Users/example/Applications/Clemens IIGS.app"
 CLEMENS_NAME="Clemens IIGS"
-CLEMENS_CONFIG="$HOME/Library/Application Support/cinekine/Clemens/config.ini"
-IMAGE="$HOME/projects/AppleIIGS/System601HD.hdv"
+CLEMENS_CONFIG="/Users/example/Library/Application Support/cinekine/Clemens/config.ini"
+IMAGE="/Users/example/projects/AppleIIGS/System601HD.hdv"
 ```
 
-The current Clemens config mounts the project hard-drive image as:
+The Clemens config should mount the project hard-drive image as:
 
 ```ini
-gs.smart.1=/Users/kevincarr/projects/AppleIIGS/System601HD.hdv
+gs.smart.1=/Users/example/projects/AppleIIGS/System601HD.hdv
 ```
 
 Launch Clemens:
@@ -72,10 +72,10 @@ Use the generic workflow script from a project directory that contains a local
 `appleiigs-project.env` file:
 
 ```sh
-/Users/kevincarr/projects/Devel_Ops/AppleIIGS/appleiigs-workflow.sh emulator
+/Users/example/projects/Devel_Ops/AppleIIGS/appleiigs-workflow.sh emulator
 ```
 
-For the current `hello` project, the project-local environment file is
+For an example `hello` project, the project-local environment file is
 `appleiigs-project.env`. It contains the project-specific source, output name,
 disk image, import metadata, Clemens paths, and `RUN_SECONDS=60`.
 
@@ -88,4 +88,4 @@ disk image, import metadata, Clemens paths, and `RUN_SECONDS=60`.
 - Do not automate SetStart configuration yet. Configure SetStart inside GS/OS
   and treat that as a prerequisite for this workflow.
 - Do not use temporary images for the normal workflow. The project image is
-  `$HOME/projects/AppleIIGS/System601HD.hdv`.
+  `/Users/example/projects/AppleIIGS/System601HD.hdv`.

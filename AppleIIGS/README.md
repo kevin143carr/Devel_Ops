@@ -31,16 +31,16 @@ From an Apple IIgs project directory, run it through the shared path and a
 project-local environment file:
 
 ```sh
-/Users/kevincarr/projects/Devel_Ops/AppleIIGS/appleiigs-workflow.sh build
-/Users/kevincarr/projects/Devel_Ops/AppleIIGS/appleiigs-workflow.sh run-iix
-/Users/kevincarr/projects/Devel_Ops/AppleIIGS/appleiigs-workflow.sh run-gsos
-/Users/kevincarr/projects/Devel_Ops/AppleIIGS/appleiigs-workflow.sh run-both
+/Users/example/projects/Devel_Ops/AppleIIGS/appleiigs-workflow.sh build
+/Users/example/projects/Devel_Ops/AppleIIGS/appleiigs-workflow.sh run-iix
+/Users/example/projects/Devel_Ops/AppleIIGS/appleiigs-workflow.sh run-gsos
+/Users/example/projects/Devel_Ops/AppleIIGS/appleiigs-workflow.sh run-both
 ```
 
 To pass an explicit environment file:
 
 ```sh
-/Users/kevincarr/projects/Devel_Ops/AppleIIGS/appleiigs-workflow.sh --env ./appleiigs-project.env run-both
+/Users/example/projects/Devel_Ops/AppleIIGS/appleiigs-workflow.sh --env ./appleiigs-project.env run-both
 ```
 
 ## Required Subsystems
@@ -119,13 +119,13 @@ the destination program if present, and import the freshly linked executable.
 Known-good import shape for a Finder-launchable GS/OS application:
 
 ```sh
-appcom -p "$HOME/projects/AppleIIGS/System601HD.hdv" HELLO S16 0 < ./hello
+appcom -p "/Users/example/projects/AppleIIGS/System601HD.hdv" HELLO S16 0 < ./hello
 ```
 
 Known-good listing check:
 
 ```sh
-appcom -ll "$HOME/projects/AppleIIGS/System601HD.hdv"
+appcom -ll "/Users/example/projects/AppleIIGS/System601HD.hdv"
 ```
 
 For the current ORCA/C executable import flow, use:
@@ -144,7 +144,7 @@ GS/OS application behavior.
 The current workflow imports built programs into a real GS/OS hard-drive image:
 
 ```sh
-$HOME/projects/AppleIIGS/System601HD.hdv
+/Users/example/projects/AppleIIGS/System601HD.hdv
 ```
 
 The workflow script creates a timestamped backup before its first import when a
@@ -162,19 +162,19 @@ An Apple IIgs emulator is required for the GS/OS-side run. The current emulator
 is Clemens, and the script automates Clemens on macOS using `/usr/bin/open` and
 AppleScript.
 
-Current locally verified Clemens settings:
+Example Clemens settings:
 
 ```sh
-CLEMENS_APP="/Users/kevincarr/bin/Clemens IIGS.app"
+CLEMENS_APP="/Users/example/Applications/Clemens IIGS.app"
 CLEMENS_NAME="Clemens IIGS"
-CLEMENS_CONFIG="$HOME/Library/Application Support/cinekine/Clemens/config.ini"
-IMAGE="$HOME/projects/AppleIIGS/System601HD.hdv"
+CLEMENS_CONFIG="/Users/example/Library/Application Support/cinekine/Clemens/config.ini"
+IMAGE="/Users/example/projects/AppleIIGS/System601HD.hdv"
 ```
 
-The current Clemens config is expected to mount the project hard-drive image as:
+The Clemens config should mount the project hard-drive image as:
 
 ```ini
-gs.smart.1=/Users/kevincarr/projects/AppleIIGS/System601HD.hdv
+gs.smart.1=/Users/example/projects/AppleIIGS/System601HD.hdv
 ```
 
 The emulator stage is intentionally timed:
@@ -204,7 +204,7 @@ shutdown, not for `iix` compile/link/test stages.
 Each Apple IIgs project should have its own `appleiigs-project.env`. Start from:
 
 ```sh
-cp /Users/kevincarr/projects/Devel_Ops/AppleIIGS/appleiigs-project.env.example ./appleiigs-project.env
+cp /Users/example/projects/Devel_Ops/AppleIIGS/appleiigs-project.env.example ./appleiigs-project.env
 ```
 
 Then edit the copied file for that project:
@@ -215,14 +215,14 @@ SOURCE="program.c"
 OBJECT="program.obj"
 PROGRAM="program"
 
-IMAGE="$HOME/projects/AppleIIGS/System601HD.hdv"
+IMAGE="/Users/example/projects/AppleIIGS/System601HD.hdv"
 DEST_NAME="PROGRAM"
 FILE_TYPE="S16"
 AUX_TYPE="0"
 
-CLEMENS_APP="/Users/kevincarr/bin/Clemens IIGS.app"
+CLEMENS_APP="/Users/example/Applications/Clemens IIGS.app"
 CLEMENS_NAME="Clemens IIGS"
-CLEMENS_CONFIG="$HOME/Library/Application Support/cinekine/Clemens/config.ini"
+CLEMENS_CONFIG="/Users/example/Library/Application Support/cinekine/Clemens/config.ini"
 RUN_SECONDS="60"
 ```
 
@@ -258,9 +258,9 @@ target intentionally:
 Map those choices to:
 
 ```text
-1 -> /Users/kevincarr/projects/Devel_Ops/AppleIIGS/appleiigs-workflow.sh run-iix
-2 -> /Users/kevincarr/projects/Devel_Ops/AppleIIGS/appleiigs-workflow.sh run-gsos
-3 -> /Users/kevincarr/projects/Devel_Ops/AppleIIGS/appleiigs-workflow.sh run-both
+1 -> /Users/example/projects/Devel_Ops/AppleIIGS/appleiigs-workflow.sh run-iix
+2 -> /Users/example/projects/Devel_Ops/AppleIIGS/appleiigs-workflow.sh run-gsos
+3 -> /Users/example/projects/Devel_Ops/AppleIIGS/appleiigs-workflow.sh run-both
 ```
 
 ## Known-Good Commands
@@ -281,19 +281,19 @@ iix ./hello
 Import into GS/OS image:
 
 ```sh
-appcom -p "$HOME/projects/AppleIIGS/System601HD.hdv" HELLO S16 0 < ./hello
+appcom -p "/Users/example/projects/AppleIIGS/System601HD.hdv" HELLO S16 0 < ./hello
 ```
 
 Inspect the GS/OS image:
 
 ```sh
-appcom -ll "$HOME/projects/AppleIIGS/System601HD.hdv"
+appcom -ll "/Users/example/projects/AppleIIGS/System601HD.hdv"
 ```
 
 Launch Clemens:
 
 ```sh
-/usr/bin/open "/Users/kevincarr/bin/Clemens IIGS.app"
+/usr/bin/open "/Users/example/Applications/Clemens IIGS.app"
 ```
 
 Check whether Clemens is running:
