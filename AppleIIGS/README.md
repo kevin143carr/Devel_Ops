@@ -189,6 +189,9 @@ The emulator stage is intentionally timed:
 3. Wait for `RUN_SECONDS`.
 4. Quit Clemens with AppleScript.
 
+Set `RUN_SECONDS` to a negative value, such as `-1`, to launch Clemens and
+leave it running without timed shutdown.
+
 This should not be treated as exact program-exit detection. It is a practical
 host-side timed run until a stronger signal is added.
 
@@ -225,6 +228,9 @@ DEST_NAME="PROGRAM"
 FILE_TYPE="S16"
 AUX_TYPE="0"
 
+EXTRA_IMPORTS='
+'
+
 CLEMENS_APP="/Users/example/Applications/Clemens IIGS.app"
 CLEMENS_NAME="Clemens IIGS"
 CLEMENS_CONFIG="/Users/example/Library/Application Support/cinekine/Clemens/config.ini"
@@ -232,8 +238,29 @@ RUN_SECONDS="60"
 ```
 
 The project env file is the right place for project-specific source names,
-output names, destination names, disk image path, emulator path, and timed-run
-duration. Do not hard-code those values in `appleiigs-workflow.sh`.
+output names, destination names, disk image path, extra imported files, emulator
+path, and timed-run duration. Do not hard-code those values in
+`appleiigs-workflow.sh`.
+
+Use `EXTRA_IMPORTS` for companion files that must be copied into the GS/OS
+image after the executable. It is newline-delimited, not comma-delimited, and
+each line uses this pipe-separated form:
+
+```sh
+EXTRA_IMPORTS='
+SOURCE|DEST_NAME|FILE_TYPE|AUX_TYPE
+'
+```
+
+For example:
+
+```sh
+EXTRA_IMPORTS='
+VINTANETGS.CFG|VINTANETGS.CFG|TXT|0
+'
+```
+
+Each source path is resolved from `PROJECT_DIR`.
 
 ## Workflow Script Stages
 
@@ -244,7 +271,7 @@ duration. Do not hard-code those values in `appleiigs-workflow.sh`.
 | `build` | Compile and link with ORCA/C through `iix`. |
 | `test-iix` | Run the already-built executable through `iix` interactively. |
 | `run-iix` | Build, then run the executable through `iix`. |
-| `import` | Import the executable into the GS/OS image with AppleCommander. |
+| `import` | Import the executable and optional `EXTRA_IMPORTS` files into the GS/OS image with AppleCommander. |
 | `emulator` | Launch Clemens, wait `RUN_SECONDS`, then quit Clemens. |
 | `run-gsos` | Build, import into the GS/OS image, then run Clemens. |
 | `run-both` | Build, test with `iix`, import, then run Clemens. |

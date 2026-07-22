@@ -15,7 +15,7 @@ Stages:
   build      Compile and link with ORCA/C through iix.
   test-iix   Run the local executable through iix interactively.
   run-iix    Build, then run the local executable through iix interactively.
-  import     Import the executable into the GS/OS image with appcom.
+  import     Import the executable and optional extra files into the GS/OS image with appcom.
   emulator   Launch Clemens, wait RUN_SECONDS, then quit Clemens.
   run-gsos   Build, import into the GS/OS image, then run Clemens.
   run-both   Build, run with iix, then import and run Clemens.
@@ -27,6 +27,9 @@ Project environment:
 
 Required variables:
   PROJECT_DIR SOURCE OBJECT PROGRAM IMAGE DEST_NAME FILE_TYPE AUX_TYPE
+
+Optional variables:
+  EXTRA_IMPORTS
 
 Required for emulator stage:
   CLEMENS_APP CLEMENS_NAME CLEMENS_CONFIG RUN_SECONDS
@@ -201,6 +204,66 @@ stage_test_iix() {
     run iix "./$PROGRAM"
 }
 
+import_file() {
+    source_file=$1
+    dest_name=$2
+    file_type=$3
+    aux_type=$4
+
+    [ -f "$source_file" ] || fail "import source file not found: $PROJECT_DIR/$source_file"
+
+    echo "Deleting existing $dest_name if present. A not-found message is acceptable."
+    show_cmd appcom -d "$IMAGE" "$dest_name"
+    appcom -d "$IMAGE" "$dest_name" || true
+
+    echo "Importing $source_file as $dest_name with type $file_type and auxiliary type $aux_type."
+    show_cmd appcom -p "$IMAGE" "$dest_name" "$file_type" "$aux_type" '<' "$source_file"
+    appcom -p "$IMAGE" "$dest_name" "$file_type" "$aux_type" < "$source_file"
+}
+
+import_extra_files() {
+    [ -n "${EXTRA_IMPORTS-}" ] || return 0
+
+    printf '%s\n' "$EXTRA_IMPORTS" | while IFS= read -r import_entry; do
+        remainder=
+        source_file=
+        dest_name=
+        file_type=
+        aux_type=
+
+        case "$import_entry" in
+            ''|'#'*)
+                continue
+                ;;
+        esac
+
+        source_file=${import_entry%%|*}
+        remainder=${import_entry#*|}
+        [ "$remainder" != "$import_entry" ] || fail "invalid EXTRA_IMPORTS entry: $import_entry"
+
+        dest_name=${remainder%%|*}
+        remainder=${remainder#*|}
+        [ "$remainder" != "$dest_name" ] || fail "invalid EXTRA_IMPORTS entry: $import_entry"
+
+        file_type=${remainder%%|*}
+        aux_type=${remainder#*|}
+        [ "$aux_type" != "$remainder" ] || fail "invalid EXTRA_IMPORTS entry: $import_entry"
+
+        case "$aux_type" in
+            *'|'*)
+                fail "invalid EXTRA_IMPORTS entry: $import_entry"
+                ;;
+        esac
+
+        [ -n "$source_file" ] || fail "EXTRA_IMPORTS source is empty: $import_entry"
+        [ -n "$dest_name" ] || fail "EXTRA_IMPORTS destination is empty: $import_entry"
+        [ -n "$file_type" ] || fail "EXTRA_IMPORTS file type is empty: $import_entry"
+        [ -n "$aux_type" ] || fail "EXTRA_IMPORTS auxiliary type is empty: $import_entry"
+
+        import_file "$source_file" "$dest_name" "$file_type" "$aux_type"
+    done
+}
+
 stage_import() {
     require_project_dir
     require_base_tools
@@ -212,13 +275,8 @@ stage_import() {
     run appcom -i "$IMAGE"
     run appcom -ll "$IMAGE"
 
-    echo "Deleting existing $DEST_NAME if present. A not-found message is acceptable."
-    show_cmd appcom -d "$IMAGE" "$DEST_NAME"
-    appcom -d "$IMAGE" "$DEST_NAME" || true
-
-    echo "Importing $PROGRAM as $DEST_NAME with type $FILE_TYPE and auxiliary type $AUX_TYPE."
-    show_cmd appcom -p "$IMAGE" "$DEST_NAME" "$FILE_TYPE" "$AUX_TYPE" '<' "$PROGRAM"
-    appcom -p "$IMAGE" "$DEST_NAME" "$FILE_TYPE" "$AUX_TYPE" < "$PROGRAM"
+    import_file "$PROGRAM" "$DEST_NAME" "$FILE_TYPE" "$AUX_TYPE"
+    import_extra_files
 
     listing=$(appcom -ll "$IMAGE")
     printf '%s\n' "$listing"
@@ -245,6 +303,13 @@ stage_emulator() {
 
     run /usr/bin/open "$CLEMENS_APP"
     wait_for_clemens_running || fail "$CLEMENS_NAME did not report as running after launch"
+
+    case "$RUN_SECONDS" in
+        -*)
+            echo "Clemens is running. RUN_SECONDS=$RUN_SECONDS; leaving emulator running."
+            return 0
+            ;;
+    esac
 
     echo "Clemens is running. Waiting $RUN_SECONDS seconds before timed shutdown."
     sleep "$RUN_SECONDS"

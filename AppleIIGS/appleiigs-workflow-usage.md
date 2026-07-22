@@ -48,6 +48,9 @@ DEST_NAME="PROGRAM"
 FILE_TYPE="S16"
 AUX_TYPE="0"
 
+EXTRA_IMPORTS='
+'
+
 CLEMENS_APP="/Users/example/Applications/Clemens IIGS.app"
 CLEMENS_NAME="Clemens IIGS"
 CLEMENS_CONFIG="/Users/example/Library/Application Support/cinekine/Clemens/config.ini"
@@ -56,6 +59,26 @@ RUN_SECONDS="60"
 
 `GOLDEN_GATE` is optional. When set, the workflow validates that directory,
 exports it, and all `iix` compile/link/run commands use that Golden Gate root.
+
+`EXTRA_IMPORTS` is optional. When set, it imports companion files after the
+main executable. Use one entry per line:
+
+```sh
+EXTRA_IMPORTS='
+SOURCE|DEST_NAME|FILE_TYPE|AUX_TYPE
+'
+```
+
+For example:
+
+```sh
+EXTRA_IMPORTS='
+VINTANETGS.CFG|VINTANETGS.CFG|TXT|0
+'
+```
+
+Each source path is resolved from `PROJECT_DIR` because the workflow changes
+into the project directory before importing.
 
 For an example `hello` project, the environment file could be:
 
@@ -70,12 +93,15 @@ For an example `hello` project, the environment file could be:
 - `test-iix`: runs `iix "./$PROGRAM"` interactively, so the visible program
   prompt can be answered.
 - `run-iix`: runs `build`, then `test-iix`.
-- `import`: deletes the existing destination file if present, then imports the
+- `import`: deletes the existing destination file if present, imports the
   executable with:
 
   ```sh
   appcom -p "$IMAGE" "$DEST_NAME" "$FILE_TYPE" "$AUX_TYPE" < "$PROGRAM"
   ```
+
+  It then imports each optional `EXTRA_IMPORTS` entry with the same delete then
+  import flow.
 
 - `emulator`: launches Clemens, waits `RUN_SECONDS`, then quits Clemens.
 - `run-gsos`: runs `build`, then `import`, then `emulator`.
@@ -110,6 +136,9 @@ target, including a fresh `build` first.
 `GS/OS only` means the workflow imports the executable into the configured HDV
 image and launches the configured emulator. It does not mean the program is run
 through `iix`.
+
+Set `RUN_SECONDS` to a negative value, such as `-1`, when the emulator should
+remain running after launch instead of being stopped by the workflow.
 
 Do not default to `both` just because it is the broadest verification. If the
 question helper is unavailable, ask the 1/2/3 question directly in the chat and
