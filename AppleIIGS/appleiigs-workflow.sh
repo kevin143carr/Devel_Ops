@@ -96,6 +96,14 @@ require_common_config() {
     require_var AUX_TYPE
 }
 
+configure_golden_gate() {
+    if [ -n "${GOLDEN_GATE-}" ]; then
+        [ -d "$GOLDEN_GATE" ] || fail "Golden Gate root not found: $GOLDEN_GATE"
+        export GOLDEN_GATE
+        echo "Using Golden Gate root: $GOLDEN_GATE"
+    fi
+}
+
 require_emulator_config() {
     require_var CLEMENS_APP
     require_var CLEMENS_NAME
@@ -299,6 +307,7 @@ done
 
 load_config
 require_common_config
+configure_golden_gate
 
 case "$STAGE" in
     all)

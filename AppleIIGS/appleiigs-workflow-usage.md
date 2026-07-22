@@ -38,6 +38,7 @@ The project environment file supplies the project-specific values:
 
 ```sh
 PROJECT_DIR="/absolute/path/to/project"
+GOLDEN_GATE="/Library/GoldenGate"
 SOURCE="program.c"
 OBJECT="program.obj"
 PROGRAM="program"
@@ -52,6 +53,9 @@ CLEMENS_NAME="Clemens IIGS"
 CLEMENS_CONFIG="/Users/example/Library/Application Support/cinekine/Clemens/config.ini"
 RUN_SECONDS="60"
 ```
+
+`GOLDEN_GATE` is optional. When set, the workflow validates that directory,
+exports it, and all `iix` compile/link/run commands use that Golden Gate root.
 
 For an example `hello` project, the environment file could be:
 

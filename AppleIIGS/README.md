@@ -110,6 +110,11 @@ iix --help
 iix -V
 ```
 
+Projects may set `GOLDEN_GATE` in their `appleiigs-project.env` to pin a
+specific Golden Gate root. The workflow exports that value before invoking
+`iix`, so compile, link, and local run stages all use the project-selected
+compiler environment.
+
 ### AppleCommander
 
 AppleCommander is the disk-image utility used by this workflow. The script uses
