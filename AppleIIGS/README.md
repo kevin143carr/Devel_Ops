@@ -272,6 +272,7 @@ Each source path is resolved from `PROJECT_DIR`.
 | `test-iix` | Run the already-built executable through `iix` interactively. |
 | `run-iix` | Build, then run the executable through `iix`. |
 | `import` | Import the executable and optional `EXTRA_IMPORTS` files into the GS/OS image with AppleCommander. |
+| `transfer` | Copy the configured GS/OS image to `IMAGE_TRANSFER_DIR`. |
 | `emulator` | Launch Clemens, wait `RUN_SECONDS`, then quit Clemens. |
 | `run-gsos` | Build, import into the GS/OS image, then run Clemens. |
 | `run-both` | Build, test with `iix`, import, then run Clemens. |

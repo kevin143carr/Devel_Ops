@@ -11,14 +11,17 @@ usage() {
 Usage: $SCRIPT_NAME [--env path] [stage]
 
 Stages:
-  all        Build, test with iix, import into the GS/OS image, then run Clemens.
+  all        Build, test with iix, import into the GS/OS image, then run emulator.
   build      Compile and link with ORCA/C through iix.
   test-iix   Run the local executable through iix interactively.
   run-iix    Build, then run the local executable through iix interactively.
   import     Import the executable and optional extra files into the GS/OS image with appcom.
-  emulator   Launch Clemens, wait RUN_SECONDS, then quit Clemens.
-  run-gsos   Build, import into the GS/OS image, then run Clemens.
-  run-both   Build, run with iix, then import and run Clemens.
+  transfer   Copy the configured GS/OS image to IMAGE_TRANSFER_DIR.
+  emulator   Launch emulator (Clemens or GSPlus), wait RUN_SECONDS, then quit.
+  launch     Alias for emulator; launch emulator using the configured project settings.
+  gsplus     Launch GSPlus emulator.
+  run-gsos   Build, import into the GS/OS image, then run emulator.
+  run-both   Build, run with iix, then import and run emulator.
   verify     Show local files and GS/OS image listing.
 
 Project environment:
@@ -29,10 +32,13 @@ Required variables:
   PROJECT_DIR SOURCE OBJECT PROGRAM IMAGE DEST_NAME FILE_TYPE AUX_TYPE
 
 Optional variables:
-  EXTRA_IMPORTS
+  EXTRA_IMPORTS IMAGE_TRANSFER_DIR
 
-Required for emulator stage:
+Required for emulator stage (Clemens):
   CLEMENS_APP CLEMENS_NAME CLEMENS_CONFIG RUN_SECONDS
+
+Required for emulator stage (GSPlus):
+  GSPLUS GSPLUS_CONFIG RUN_SECONDS
 EOF
 }
 
@@ -108,10 +114,18 @@ configure_golden_gate() {
 }
 
 require_emulator_config() {
-    require_var CLEMENS_APP
-    require_var CLEMENS_NAME
-    require_var CLEMENS_CONFIG
-    require_var RUN_SECONDS
+    if [ -n "${GSPLUS-}" ]; then
+        require_var GSPLUS
+        require_var GSPLUS_CONFIG
+        require_var RUN_SECONDS
+    elif [ -n "${CLEMENS_APP-}" ]; then
+        require_var CLEMENS_APP
+        require_var CLEMENS_NAME
+        require_var CLEMENS_CONFIG
+        require_var RUN_SECONDS
+    else
+        fail "Either GSPLUS or CLEMENS_APP must be set for emulator stages. Please set one of these in your project environment file ($CONFIG_FILE). For GSPlus: GSPLUS, GSPLUS_CONFIG, RUN_SECONDS. For Clemens: CLEMENS_APP, CLEMENS_NAME, CLEMENS_CONFIG, RUN_SECONDS."
+    fi
 }
 
 require_command() {
@@ -150,11 +164,23 @@ backup_image_if_needed() {
 }
 
 is_clemens_running() {
+    if [ -n "${GSPLUS-}" ]; then
+        # For GSPlus, we can't easily check if it's running via AppleScript
+        # so we'll assume it starts successfully
+        return 0
+    fi
+    
     result=$(/usr/bin/osascript -e "application \"$CLEMENS_NAME\" is running" 2>/dev/null || echo "false")
     [ "$result" = "true" ]
 }
 
 wait_for_clemens_running() {
+    if [ -n "${GSPLUS-}" ]; then
+        # For GSPlus, we'll just wait a bit for it to start
+        sleep 3
+        return 0
+    fi
+    
     deadline=20
     elapsed=0
 
@@ -170,6 +196,12 @@ wait_for_clemens_running() {
 }
 
 wait_for_clemens_shutdown() {
+    if [ -n "${GSPLUS-}" ]; then
+        # For GSPlus, we'll just wait a bit for it to quit
+        sleep 2
+        return 0
+    fi
+    
     deadline=10
     elapsed=0
 
@@ -286,37 +318,48 @@ stage_import() {
 
 stage_emulator() {
     require_emulator_tools
-    [ -f "$IMAGE" ] || fail "disk image not found: $IMAGE"
-    [ -d "$CLEMENS_APP" ] || fail "Clemens app bundle not found: $CLEMENS_APP"
+    
+    if [ -n "${GSPLUS-}" ]; then
+        [ -f "$GSPLUS" ] || fail "GSPlus app not found: $GSPLUS"
+        [ -f "$GSPLUS_CONFIG" ] || fail "GSPlus config not found: $GSPLUS_CONFIG"
+        
+        echo "Starting GSPlus with config: $GSPLUS_CONFIG"
+        run /usr/bin/open -n "$GSPLUS" --args -cfg "$GSPLUS_CONFIG"
+    elif [ -n "${CLEMENS_APP-}" ]; then
+        [ -f "$IMAGE" ] || fail "disk image not found: $IMAGE"
+        [ -d "$CLEMENS_APP" ] || fail "Clemens app bundle not found: $CLEMENS_APP"
 
-    if [ -f "$CLEMENS_CONFIG" ]; then
-        run grep -F "gs.smart.1=$IMAGE" "$CLEMENS_CONFIG"
-    else
-        fail "Clemens config not found: $CLEMENS_CONFIG"
-    fi
+        if [ -f "$CLEMENS_CONFIG" ]; then
+            run grep -F "gs.smart.1=$IMAGE" "$CLEMENS_CONFIG"
+        else
+            fail "Clemens config not found: $CLEMENS_CONFIG"
+        fi
 
-    if is_clemens_running; then
-        echo "$CLEMENS_NAME is already running; quitting it before launch."
+        if is_clemens_running; then
+            echo "$CLEMENS_NAME is already running; quitting it before launch."
+            run /usr/bin/osascript -e "tell application \"$CLEMENS_NAME\" to quit"
+            wait_for_clemens_shutdown || fail "$CLEMENS_NAME did not quit before launch"
+        fi
+
+        run /usr/bin/open "$CLEMENS_APP"
+        wait_for_clemens_running || fail "$CLEMENS_NAME did not report as running after launch"
+
+        case "$RUN_SECONDS" in
+            -*)
+                echo "Clemens is running. RUN_SECONDS=$RUN_SECONDS; leaving emulator running."
+                return 0
+                ;;
+        esac
+
+        echo "Clemens is running. Waiting $RUN_SECONDS seconds before timed shutdown."
+        sleep "$RUN_SECONDS"
+
         run /usr/bin/osascript -e "tell application \"$CLEMENS_NAME\" to quit"
-        wait_for_clemens_shutdown || fail "$CLEMENS_NAME did not quit before launch"
+        wait_for_clemens_shutdown || fail "$CLEMENS_NAME did not quit cleanly"
+        echo "Clemens timed run completed."
+    else
+        fail "Neither GSPLUS nor CLEMENS_APP is configured. Please set one of these in your project environment file."
     fi
-
-    run /usr/bin/open "$CLEMENS_APP"
-    wait_for_clemens_running || fail "$CLEMENS_NAME did not report as running after launch"
-
-    case "$RUN_SECONDS" in
-        -*)
-            echo "Clemens is running. RUN_SECONDS=$RUN_SECONDS; leaving emulator running."
-            return 0
-            ;;
-    esac
-
-    echo "Clemens is running. Waiting $RUN_SECONDS seconds before timed shutdown."
-    sleep "$RUN_SECONDS"
-
-    run /usr/bin/osascript -e "tell application \"$CLEMENS_NAME\" to quit"
-    wait_for_clemens_shutdown || fail "$CLEMENS_NAME did not quit cleanly"
-    echo "Clemens timed run completed."
 }
 
 stage_run_iix() {
@@ -347,6 +390,18 @@ stage_verify() {
     run appcom -ll "$IMAGE"
 }
 
+stage_transfer() {
+    require_project_dir
+    require_var IMAGE_TRANSFER_DIR
+    [ -f "$IMAGE" ] || fail "disk image not found: $IMAGE"
+    [ -d "$IMAGE_TRANSFER_DIR" ] || fail "image transfer directory not found: $IMAGE_TRANSFER_DIR"
+
+    image_base=$(basename "$IMAGE")
+    transfer_dest="$IMAGE_TRANSFER_DIR/$image_base"
+    run cp "$IMAGE" "$transfer_dest"
+    echo "Transferred disk image: $transfer_dest"
+}
+
 while [ "$#" -gt 0 ]; do
     case "$1" in
         --env)
@@ -359,7 +414,7 @@ while [ "$#" -gt 0 ]; do
             usage
             exit 0
             ;;
-        all|build|test-iix|run-iix|import|emulator|run-gsos|run-both|verify)
+        all|build|test-iix|run-iix|import|transfer|emulator|launch|run-gsos|run-both|verify)
             STAGE=$1
             shift
             ;;
@@ -394,7 +449,18 @@ case "$STAGE" in
     import)
         stage_import
         ;;
+    transfer)
+        stage_transfer
+        ;;
+    launch)
+        require_emulator_config
+        stage_emulator
+        ;;
     emulator)
+        require_emulator_config
+        stage_emulator
+        ;;
+    gsplus)
         require_emulator_config
         stage_emulator
         ;;

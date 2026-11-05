@@ -44,6 +44,7 @@ OBJECT="program.obj"
 PROGRAM="program"
 
 IMAGE="/Users/example/projects/AppleIIGS/System601HD.hdv"
+IMAGE_TRANSFER_DIR="/Users/example/AppleShare/transfer"
 DEST_NAME="PROGRAM"
 FILE_TYPE="S16"
 AUX_TYPE="0"
@@ -80,6 +81,9 @@ VINTANETGS.CFG|VINTANETGS.CFG|TXT|0
 Each source path is resolved from `PROJECT_DIR` because the workflow changes
 into the project directory before importing.
 
+`IMAGE_TRANSFER_DIR` is optional. When set, the explicit `transfer` stage copies
+the configured `IMAGE` to that directory using the same filename.
+
 For an example `hello` project, the environment file could be:
 
 ```text
@@ -103,6 +107,9 @@ For an example `hello` project, the environment file could be:
   It then imports each optional `EXTRA_IMPORTS` entry with the same delete then
   import flow.
 
+- `transfer`: copies the configured `IMAGE` to `IMAGE_TRANSFER_DIR` using the
+  image basename. This stage is explicit and is not run automatically by
+  `import`, `run-gsos`, or `run-both`.
 - `emulator`: launches Clemens, waits `RUN_SECONDS`, then quits Clemens.
 - `run-gsos`: runs `build`, then `import`, then `emulator`.
 - `run-both`: runs `build`, then `test-iix`; only if that succeeds, runs
